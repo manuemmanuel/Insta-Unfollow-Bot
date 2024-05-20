@@ -1,34 +1,45 @@
-import os
+
+import instaloader
+import requests
 import time
-from instabot import Bot
 
-# Initialize the bot
-bot = Bot()
+INSTAGRAM_USERNAME = ""
+INSTAGRAM_PASSWORD = ""
 
-# Securely handle credentials using environment variables
-username = os.getenv('INSTAGRAM_USERNAME')
-password = os.getenv('INSTAGRAM_PASSWORD')
-
-if not username or not password:
+if not INSTAGRAM_USERNAME or not INSTAGRAM_PASSWORD:
     print("Please set the INSTAGRAM_USERNAME and INSTAGRAM_PASSWORD environment variables.")
     exit()
 
-# Login to Instagram
-bot.login(username=username, password=password)
+L = instaloader.Instaloader()
+L.login(INSTAGRAM_USERNAME, INSTAGRAM_PASSWORD)
 
-# Get the list of your followers
-followers = bot.get_user_followers(username)
+profile = instaloader.Profile.from_username(L.context, INSTAGRAM_USERNAME)
 
-# Get the list of users you are following
-following = bot.get_user_following(username)
+followers = set(profile.get_followers())
+followees = set(profile.get_followees())
 
-# Identify users who you follow but who don't follow you back
-not_following_back = [user for user in following if user not in followers]
+not_following_back = followees - followers
 
-# Unfollow users who don't follow you back with rate limiting
-for user_id in not_following_back:
-    bot.unfollow(user_id)
-    print(f"Unfollowed user ID: {user_id}")
-    time.sleep(30)  # Wait 30 seconds between unfollows to avoid rate limiting
+session = L.context._session
+
+def get_username(user_id):
+    try:
+        user = instaloader.Profile.from_id(L.context, user_id)
+        return user.username
+    except instaloader.ProfileNotExistsException:
+        return "Unknown"
+
+def unfollow(user_id):
+    username = get_username(user_id)
+    unfollow_url = f"https://www.instagram.com/web/friendships/{user_id}/unfollow/"
+    response = session.post(unfollow_url)
+    if response.status_code == 200:
+        print(f"Unfollowed user: {username} (ID: {user_id})")
+    else:
+        print(f"Failed to unfollow user: {username} (ID: {user_id}), Status Code: {response.status_code}")
+
+for user in not_following_back:
+    unfollow(user.userid)
+    time.sleep(30)
 
 print(f"Unfollowed {len(not_following_back)} users who don't follow you back.")
