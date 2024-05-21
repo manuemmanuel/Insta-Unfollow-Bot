@@ -35,4 +35,4 @@ python main.py
 - Unfollow users who don't follow you back, with a 30-second delay between each unfollow action to avoid rate limiting.
 
 ## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/manuemmanuel/Insta-Unfollow-Bot/blob/main/LICENSE) file for details.
