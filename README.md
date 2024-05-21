@@ -33,3 +33,6 @@ python main.py
 - Retrieve the list of followers and followees.
 - Identify users who don't follow you back.
 - Unfollow users who don't follow you back, with a 30-second delay between each unfollow action to avoid rate limiting.
+
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
