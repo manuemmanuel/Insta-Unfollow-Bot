@@ -31,9 +31,10 @@ def get_username(user_id):
 def unfollow(user_id):
     username = get_username(user_id)
     unfollow_url = f"https://www.instagram.com/web/friendships/{user_id}/unfollow/"
+    link = f"https://www.instagram.com/{username}"
     response = session.post(unfollow_url)
     if response.status_code == 200:
-        print(f"Unfollowed user: {username} (ID: {user_id})")
+        print(f"Unfollowed user: {username} (ID: {user_id}, Profile Link: {link} )")
     else:
         print(f"Failed to unfollow user: {username} (ID: {user_id}), Status Code: {response.status_code}")
 
